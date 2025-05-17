@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  service_b:
+    build:
+      context: .
+      dockerfile: Dockerfile-service-b
+    container_name: service-b
+    ports:
+      - "50055"
+    networks:
+      - services-network
+networks:
+  services-network:
