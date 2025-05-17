@@ -6,20 +6,25 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/israelalvesmelo/desafio-otel/cmd/config"
 	"github.com/israelalvesmelo/desafio-otel/internal/inputhandle/domain/dto"
 	"github.com/israelalvesmelo/desafio-otel/internal/temperature/domain/entity"
-	"github.com/israelalvesmelo/desafio-otel/internal/temperature/domain/usecase"
 	"github.com/israelalvesmelo/desafio-otel/internal/utils"
 )
 
+//TODO: ADICIONAR O OTEL NO HANDLER
+
 type InputHandler struct {
+	config *config.Config
 }
 
-func NewInputHandler(useCase *usecase.GetTemperatureUseCase) *InputHandler {
-	return &InputHandler{}
+func NewInputHandler(config *config.Config) *InputHandler {
+	return &InputHandler{
+		config: config,
+	}
 }
 
-func (h *InputHandler) GetWeather(w http.ResponseWriter, r *http.Request) {
+func (h *InputHandler) PostWeather(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	bodyBytes, readErr := io.ReadAll(r.Body)
@@ -41,7 +46,7 @@ func (h *InputHandler) GetWeather(w http.ResponseWriter, r *http.Request) {
 	reqCtx, reqCtxErr := http.NewRequestWithContext(
 		ctx,
 		http.MethodGet,
-		"http://service_b:50055/temperature?cep="+location.Cep,
+		h.config.ServiceB.Host+"/temperature?cep="+location.Cep,
 		nil,
 	)
 	if reqCtxErr != nil {

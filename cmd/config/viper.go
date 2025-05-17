@@ -41,7 +41,12 @@ func (v *Viper) ReadViper(config *Config) {
 
 func (v *Viper) readConfig(c *Config) {
 	c.CEP.URL = viper.GetString("cep.url")
-	c.App.Port = viper.GetString("app.port")
+
 	c.Temperature.URL = viper.GetString("temperature.url")
 	c.Temperature.ApiKey = viper.GetString("temperature.api_key")
+
+	c.ServiceA.Port = viper.GetString("service_a.port")
+
+	c.ServiceB.Port = viper.GetString("service_b.port")
+	c.ServiceB.Host = viper.GetString("service_b.host")
 }

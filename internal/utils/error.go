@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -15,6 +16,8 @@ func Error(w http.ResponseWriter, error string, code int) {
 		Code:    code,
 		Message: error,
 	}
+
+	fmt.Sprintln("error:", error)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)

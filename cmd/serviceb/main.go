@@ -5,10 +5,10 @@ import (
 
 	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/israelalvesmelo/desafio-otel/cmd/config"
+	"github.com/israelalvesmelo/desafio-otel/infra/webserver"
 	"github.com/israelalvesmelo/desafio-otel/internal/temperature/domain/usecase"
 	"github.com/israelalvesmelo/desafio-otel/internal/temperature/infra/gateway"
 	"github.com/israelalvesmelo/desafio-otel/internal/temperature/infra/web/handler"
-	"github.com/israelalvesmelo/desafio-otel/internal/temperature/infra/web/webserver"
 )
 
 func main() {
@@ -28,7 +28,7 @@ func main() {
 	handler := handler.NewTemperatureHandler(useCase)
 
 	// Create server
-	server := webserver.NewWebServer(fmt.Sprintf(":%s", cfg.App.Port))
+	server := webserver.NewWebServer(fmt.Sprintf(":%s", cfg.ServiceB.Port))
 	server.AddMiddleware(chimiddleware.Logger)
 
 	server.AddHandler("/temperature", handler.GetWeather)

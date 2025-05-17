@@ -1,9 +1,19 @@
 package config
 
 type Config struct {
+	ServiceA    ServiceA
+	ServiceB    ServiceB
 	Temperature Temperature
 	CEP         CEP
-	App         App
+}
+
+type ServiceB struct {
+	Port string
+	Host string
+}
+
+type ServiceA struct {
+	Port string
 }
 
 type Temperature struct {
@@ -13,8 +23,4 @@ type Temperature struct {
 
 type CEP struct {
 	URL string
-}
-
-type App struct {
-	Port string
 }

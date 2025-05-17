@@ -1,14 +1,25 @@
-version: '3.7'
-
 services:
-  service_b:
+  service-b:
     build:
       context: .
       dockerfile: Dockerfile-service-b
+    image: service-b
     container_name: service-b
     ports:
       - "50055"
     networks:
       - services-network
+  service-a:
+    build:
+      context: .
+      dockerfile: Dockerfile-service-a
+    image: service-a
+    container_name: service-a
+    ports:
+      - "8080:8080"
+    networks:
+      - services-network
+    depends_on:
+      - service-b
 networks:
   services-network:
