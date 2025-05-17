@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"regexp"
 
 	"github.com/israelalvesmelo/desafio-otel/internal/temperature/domain/entity"
 	"github.com/israelalvesmelo/desafio-otel/internal/temperature/domain/usecase"
+	"github.com/israelalvesmelo/desafio-otel/internal/utils"
 )
 
 type TemperatureHandler struct {
@@ -23,7 +23,7 @@ func NewTemperatureHandler(useCase *usecase.GetTemperatureUseCase) *TemperatureH
 
 func (h *TemperatureHandler) GetWeather(w http.ResponseWriter, r *http.Request) {
 	cep := r.URL.Query().Get("cep")
-	if err := h.CEPValidation(cep); err != nil {
+	if err := utils.CEPValidation(cep); err != nil {
 		h.handlerError(w, err)
 		return
 	}
@@ -36,18 +36,9 @@ func (h *TemperatureHandler) GetWeather(w http.ResponseWriter, r *http.Request) 
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(weather); err != nil {
-		Error(w, err.Error(), http.StatusInternalServerError)
+		utils.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusOK)
-}
-
-func (h *TemperatureHandler) CEPValidation(cep string) error {
-	re := regexp.MustCompile(`^\d{5}-\d{3}$`)
-	if !re.MatchString(cep) {
-		return entity.ErrZipcodeNotValid
-	}
-
-	return nil
 }
 
 func (h *TemperatureHandler) handlerError(w http.ResponseWriter, err error) {
@@ -55,13 +46,13 @@ func (h *TemperatureHandler) handlerError(w http.ResponseWriter, err error) {
 
 	switch {
 	case errors.Is(err, entity.ErrZipcodeNotValid):
-		Error(w, entity.ErrZipcodeNotValid.Error(), http.StatusUnprocessableEntity)
+		utils.Error(w, entity.ErrZipcodeNotValid.Error(), http.StatusUnprocessableEntity)
 		return
 	case errors.Is(err, entity.ErrZipcodeNotFound):
-		Error(w, entity.ErrZipcodeNotFound.Error(), http.StatusNotFound)
+		utils.Error(w, entity.ErrZipcodeNotFound.Error(), http.StatusNotFound)
 		return
 	case err != nil:
-		Error(w, err.Error(), http.StatusInternalServerError)
+		utils.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
