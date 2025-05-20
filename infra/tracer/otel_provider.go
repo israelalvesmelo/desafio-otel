@@ -3,6 +3,7 @@ package tracer
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -13,9 +14,22 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
 )
 
+func SetupTelemetry(ctx context.Context, providerName, urlExport string) func() {
+	shutdown, err := newTracerProvider(providerName, urlExport)
+	if err != nil {
+		log.Fatalf("failed to initialize telemetry: %s", err.Error())
+	}
+
+	return func() {
+		if err := shutdown(ctx); err != nil {
+			log.Printf("failed shutting down tracer provider: %s", err.Error())
+		}
+	}
+}
+
 type ShutdownFunction func(ctx context.Context) error
 
-func InitProvider(serviceName, collectorURL string) (ShutdownFunction, error) {
+func newTracerProvider(serviceName, collectorURL string) (ShutdownFunction, error) {
 	ctx := context.Background()
 	res, resErr := resource.New(
 		ctx,

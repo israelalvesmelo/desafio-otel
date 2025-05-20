@@ -10,18 +10,21 @@ import (
 	"time"
 
 	"github.com/israelalvesmelo/desafio-otel/cmd/config"
+	"github.com/israelalvesmelo/desafio-otel/infra/tracer"
 	"github.com/israelalvesmelo/desafio-otel/internal/temperature/domain/dto"
 	"github.com/israelalvesmelo/desafio-otel/internal/temperature/domain/entity"
 	gatewaydomain "github.com/israelalvesmelo/desafio-otel/internal/temperature/domain/gateway"
 )
 
 type LocationGatewayImpl struct {
-	config *config.CEP
+	config       *config.CEP
+	tracerHelper *tracer.TracerHelper
 }
 
-func NewLocationGateway(config *config.CEP) gatewaydomain.LocationGateway {
+func NewLocationGateway(config *config.CEP, tracerHelper *tracer.TracerHelper) gatewaydomain.LocationGateway {
 	return LocationGatewayImpl{
-		config: config,
+		config:       config,
+		tracerHelper: tracerHelper,
 	}
 }
 
@@ -32,6 +35,9 @@ var createCepEndpoint = func(baseUrl, cep string) string {
 func (g LocationGatewayImpl) GetLocation(ctx context.Context, cep string) (*entity.Location, error) {
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
+
+	ctx, span := g.tracerHelper.StartSpan(ctx, "service_b:get_CEP")
+	defer span.End()
 
 	req, reqErr := http.NewRequestWithContext(
 		ctx,

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 
@@ -25,7 +24,7 @@ func main() {
 	defer cancel()
 
 	// Initialize telemetry
-	shutdown := initTelemetry(ctx, cfg)
+	shutdown := tracer.SetupTelemetry(ctx, "service_a_orchestration", cfg.Zipkin.Endpoint)
 	defer shutdown()
 
 	// Initialize tracer helper
@@ -48,19 +47,8 @@ func main() {
 }
 
 func setupSignalContext() (context.Context, context.CancelFunc) {
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt)
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	return ctx, cancel
-}
-
-func initTelemetry(ctx context.Context, cfg config.Config) func() {
-	shutdown, err := tracer.InitProvider("service_a_orchestration", cfg.Zipkin.Endpoint)
-	if err != nil {
-		log.Fatalf("failed to initialize telemetry: %s", err.Error())
-	}
-
-	return func() {
-		if err := shutdown(ctx); err != nil {
-			log.Printf("failed shutting down tracer provider: %s", err.Error())
-		}
-	}
 }

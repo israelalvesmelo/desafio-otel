@@ -31,8 +31,12 @@ func (t *TracerHelper) ExtractContext(r *http.Request) context.Context {
 }
 
 // Cria um novo span a partir do contexto
-func (t *TracerHelper) StartSpan(ctx context.Context) (context.Context, trace.Span) {
-	return t.templateData.OTELTracer.Start(ctx, t.templateData.RequestNameOtel)
+func (t *TracerHelper) StartSpan(ctx context.Context, spanName ...string) (context.Context, trace.Span) {
+	name := t.templateData.RequestNameOtel
+	if len(spanName) > 0 {
+		name = spanName[0]
+	}
+	return t.templateData.OTELTracer.Start(ctx, name)
 }
 
 // Injeta o contexto OTEL no header da requisição de saída

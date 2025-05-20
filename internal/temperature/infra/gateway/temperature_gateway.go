@@ -13,17 +13,21 @@ import (
 	"time"
 
 	"github.com/israelalvesmelo/desafio-otel/cmd/config"
+	"github.com/israelalvesmelo/desafio-otel/infra/tracer"
 	"github.com/israelalvesmelo/desafio-otel/internal/temperature/domain/dto"
 	gatewaydomain "github.com/israelalvesmelo/desafio-otel/internal/temperature/domain/gateway"
 )
 
 type TemperatureGatewayImpl struct {
-	config *config.Temperature
+	config       *config.Temperature
+	tracerHelper *tracer.TracerHelper
 }
 
-func NewTemperatureGateway(config *config.Temperature) gatewaydomain.TemperatureGateway {
+func NewTemperatureGateway(config *config.Temperature,
+	tracerHelper *tracer.TracerHelper) gatewaydomain.TemperatureGateway {
 	return TemperatureGatewayImpl{
-		config: config,
+		config:       config,
+		tracerHelper: tracerHelper,
 	}
 }
 
@@ -50,6 +54,10 @@ func (g TemperatureGatewayImpl) GetTempCelsius(ctx context.Context, location str
 
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
+
+	ctx, span := g.tracerHelper.StartSpan(ctx, "service_b:get_Weather")
+	defer span.End()
+
 	req, reqErr := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if reqErr != nil {
 		fmt.Printf("Error creating request: %s\n", reqErr)
