@@ -49,4 +49,6 @@ func (v *Viper) readConfig(c *Config) {
 
 	c.ServiceB.Port = viper.GetString("service_b.port")
 	c.ServiceB.Host = viper.GetString("service_b.host")
+
+	c.Zipkin.Endpoint = viper.GetString("zipkin.endpoint")
 }

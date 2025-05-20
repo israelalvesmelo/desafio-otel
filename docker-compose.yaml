@@ -1,7 +1,7 @@
 services:
-  zipkin:
+  zipkin-svc:
     image: openzipkin/zipkin
-    container_name: zipkin
+    container_name: zipkin-svc
     environment:
       - STORAGE_TYPE=mem
     ports:
@@ -19,7 +19,7 @@ services:
       - "4317:4317" # gRPC port
       - "4318:4318" # HTTP port
     depends_on:
-      - zipkin
+      - zipkin-svc
     networks:
       - services-network
   service-b:

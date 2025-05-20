@@ -6,7 +6,6 @@ type Config struct {
 	Temperature Temperature
 	CEP         CEP
 	Zipkin      Zipkin
-	Otel        Otel
 }
 
 type ServiceB struct {
@@ -28,10 +27,5 @@ type CEP struct {
 }
 
 type Zipkin struct {
-	Host     string
 	Endpoint string
-}
-
-type Otel struct {
-	Host string
 }
